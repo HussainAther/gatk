@@ -1,17 +1,22 @@
+samples = ["Undetermined_S0_L001_R1_001", 
+           "Undetermined_S0_L001_R2_001", 
+           "Undetermined_S0_L002_R1_002",
+           "Undetermined_S0_L001_R2_002"]
+
 if "restrict-regions" in config["processing"]:
     rule compose_regions:
         input:
             config["processing"]["restrict-regions"]
         output:
-            "called/{contig}.regions.bed"
+            "called/regions.bed"
         conda:
             "../envs/bedops.yaml"
         shell:
-            "bedextract {wildcards.contig} {input} > {output}"
+            "bedextract {input} > {output}"
 
 
 def get_call_variants_params(wildcards, input):
-    return (get_regions_param(regions=input.regions, default=f"--intervals {wildcards.contig}") +
+    return (get_regions_param(regions=input.regions) +
             config["params"]["gatk"]["HaplotypeCaller"])
 
 
@@ -20,11 +25,12 @@ rule call_variants:
         bam=get_sample_bams,
         ref=config["ref"]["genome"],
         known=config["ref"]["known-variants"],
-        regions="called/{contig}.regions.bed" if config["processing"].get("restrict-regions") else []
+        regions = []
+#        regions="called/regions.bed" if config["processing"].get("restrict-regions") else []
     output:
-        gvcf=protected("called/{sample}.{contig}.g.vcf.gz")
+        gvcf=protected("called/{sample}.g.vcf.gz")
     log:
-        "logs/gatk/haplotypecaller/{sample}.{contig}.log"
+        "logs/gatk/haplotypecaller/{sample}.log"
     params:
         extra=get_call_variants_params
     wrapper:
@@ -34,11 +40,12 @@ rule call_variants:
 rule combine_calls:
     input:
         ref=config["ref"]["genome"],
-        gvcfs=expand("called/{sample}.{{contig}}.g.vcf.gz", sample=samples.index)
+#        gvcfs="/data/athersh/dna-seq-gatk-variant-calling/00-All.vcf.gz"
+        gvcfs=expand("called/{sample}.g.vcf.gz", sample=samples)
     output:
-        gvcf="called/all.{contig}.g.vcf.gz"
+        gvcf="called/all.g.vcf.gz"
     log:
-        "logs/gatk/combinegvcfs.{contig}.log"
+        "logs/gatk/combinegvcfs.log"
     wrapper:
         "0.27.1/bio/gatk/combinegvcfs"
 
@@ -46,23 +53,14 @@ rule combine_calls:
 rule genotype_variants:
     input:
         ref=config["ref"]["genome"],
-        gvcf="called/all.{contig}.g.vcf.gz"
+#        gvcf=expand("/data/athersh/dna-seq/gatk-variant-calling/{sample}.g.vcf.gz",sample=samples)
+        gvcf="called/all.g.vcf.gz"
     output:
-        vcf=temp("genotyped/all.{contig}.vcf.gz")
+        vcf=temp("genotyped/all.vcf.gz")
     params:
         extra=config["params"]["gatk"]["GenotypeGVCFs"]
     log:
-        "logs/gatk/genotypegvcfs.{contig}.log"
+        "logs/gatk/genotypegvcfs.log"
     wrapper:
         "0.27.1/bio/gatk/genotypegvcfs"
 
-
-rule merge_variants:
-    input:
-        vcf=expand("genotyped/all.{contig}.vcf.gz", contig=contigs)
-    output:
-        vcf="genotyped/all.vcf.gz"
-    log:
-        "logs/picard/merge-genotyped.log"
-    wrapper:
-        "0.27.1/bio/picard/mergevcfs"
