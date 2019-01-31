@@ -8,23 +8,26 @@ report: "report/workflow.rst"
 
 rule all:
     input:
-        "annotated/all.vcf.gz",
+        ["annotated/all.vcf.gz",
         "qc/multiqc.html",
         "plots/depths.svg",
-        "plots/allele-freqs.svg",
+        "plots/allele-freqs.svg"]
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 validate(samples, schema="schemas/samples.schema.yaml")
-
 units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
 validate(units, schema="schemas/units.schema.yaml")
 validate(config, schema="schemas/config.schema.yaml")
+
+if config["filtering"]["vqsr"]:
+    filter_type="recalibrated"
+else:
+    filter_type="hardfiltered"
 
 ##### Wildcard constraints #####
 wildcard_constraints:
     vartype="snvs|indels",
     sample="|".join(samples.index),
-
 
 ##### Helper functions #####
 
@@ -35,28 +38,21 @@ def get_fastq(wildcards):
         return {"r1": fastqs.fq1, "r2": fastqs.fq2}
     return {"r1": fastqs.fq1}
 
-
 def is_single_end(sample):
     """Return True if sample is single end."""
     return pd.isnull(units.loc[(sample), "fq2"])
 
-
 def get_read_group(wildcards):
     """Denote sample name and platform in read group."""
-    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(
-        platform=units.loc[(sample), "platform"])
-
+    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(platform=units.loc[(sample), "platform"])
 
 def get_trimmed_reads(wildcards):
     """Get trimmed reads of given sample-unit."""
     return "{Batch}".format(**wildcards)
 
-
 def get_sample_bams(wildcards):
     """Get all aligned reads of given sample."""
-    return expand("recal/{sample}.bam",
-                  sample=wildcards.sample)
-
+    return expand("recal/{sample}.bam", sample=wildcards.sample)
 
 def get_regions_param(regions=config["processing"].get("restrict-regions"), default=""):
     if regions:
@@ -68,9 +64,7 @@ def get_regions_param(regions=config["processing"].get("restrict-regions"), defa
     return default
 
 def get_call_variants_params(wildcards, input):
-    return (get_regions_param(regions=input.regions, +
-        config["params"]["gatk"]["HaplotypeCaller"])
-
+    return (get_regions_param(regions=input.regions, config["params"]["gatk"]["HaplotypeCaller"])
 
 def get_recal_input(bai=False):
     # case 1: no duplicate removal
@@ -114,19 +108,12 @@ rule snpeff:
     wrapper:
         "0.27.1/bio/snpeff"
 
-
-def get_call_variants_params(wildcards, input):
-    return (get_regions_param(regions=input.regions) +
-            config["params"]["gatk"]["HaplotypeCaller"])
-
-
 rule call_variants:
     input:
         bam=get_sample_bams,
         ref=config["ref"]["genome"],
         known=config["ref"]["known-variants"],
         regions = []
-#        regions="called/regions.bed" if config["processing"].get("restrict-regions") else []
     output:
         gvcf=protected("called/{sample}.g.vcf.gz")
     log:
@@ -136,11 +123,9 @@ rule call_variants:
     wrapper:
         "0.27.1/bio/gatk/haplotypecaller"
 
-
 rule combine_calls:
     input:
         ref=config["ref"]["genome"],
-#        gvcfs="/data/athersh/dna-seq-gatk-variant-calling/00-All.vcf.gz"
         gvcfs=expand("called/{sample}.g.vcf.gz", sample=samples)
     output:
         gvcf="called/all.g.vcf.gz"
@@ -149,11 +134,9 @@ rule combine_calls:
     wrapper:
         "0.27.1/bio/gatk/combinegvcfs"
 
-
 rule genotype_variants:
     input:
         ref=config["ref"]["genome"],
-#        gvcf=expand("/data/athersh/dna-seq/gatk-variant-calling/{sample}.g.vcf.gz",sample=samples)
         gvcf="called/all.g.vcf.gz"
     output:
         vcf=temp("genotyped/all.vcf.gz")
@@ -165,9 +148,7 @@ rule genotype_variants:
         "0.27.1/bio/gatk/genotypegvcfs"
 
 def get_vartype_arg(wildcards):
-    return "--select-type-to-include {}".format(
-        "SNP" if wildcards.vartype == "snvs" else "INDEL")
-
+    return "--select-type-to-include {}".format("SNP" if wildcards.vartype == "snvs" else "INDEL")
 
 rule select_calls:
     input:
@@ -182,12 +163,8 @@ rule select_calls:
     wrapper:
         "0.27.1/bio/gatk/selectvariants"
 
-
 def get_filter(wildcards):
-    return {
-        "snv-hard-filter":
-        config["filtering"]["hard"][wildcards.vartype]}
-
+    return {"snv-hard-filter": config["filtering"]["hard"][wildcards.vartype]}
 
 rule hard_filter_calls:
     input:
@@ -214,23 +191,15 @@ rule recalibrate_calls:
     wrapper:
         "0.27.1/bio/gatk/variantrecalibrator"
 
-
 rule merge_calls:
     input:
-        vcf=expand("filtered/all.{vartype}.{filtertype}.vcf.gz",
-                   vartype=["snvs", "indels"],
-                   filtertype="recalibrated"
-                              if config["filtering"]["vqsr"]
-                              else "hardfiltered")
+        vcf=expand("filtered/all.{vartype}.{filtertype}.vcf.gz", vartype=["snvs", "indels"], filtertype=filter_type)
     output:
         vcf="filtered/all.vcf.gz"
     log:
         "logs/picard/merge-filtered.log"
     wrapper:
         "0.27.1/bio/picard/mergevcfs"
-
-
-
 
 rule map_reads:
     input:
@@ -328,9 +297,7 @@ rule vcf_to_tsv:
     conda:
         "envs/rbt.yaml"
     shell:
-        "bcftools view --apply-filters PASS --output-type u {input} | "
-        "rbt vcf-to-txt -g --fmt DP AD --info ANN | "
-        "gzip > {output}"
+        "bcftools view --apply-filters PASS --output-type u {input} | rbt vcf-to-txt -g --fmt DP AD --info ANN | gzip > {output}"
 
 rule plot_stats:
     input:
