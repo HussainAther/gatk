@@ -1,5 +1,4 @@
 import pandas as pd
-import snakemake
 
 shell("module load GATK")
 
@@ -17,19 +16,7 @@ validate(samples, schema="schemas/samples.schema.yaml")
 
 units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
 validate(units, schema="schemas/units.schema.yaml")
-
-configfile: "config.yaml"
 validate(config, schema="schemas/config.schema.yaml")
-
-#rule report:
-#    input:  "report/workflow.rst"
-#    output: html="report.html"
-#    run:
-#        report("""
-#        Variant Calling report lol
-#
-#        """, output.html, metadata="Syed Hussain Ather (shussainather@gmail.com)", **input)
-
 
 rule snpeff:
     input:
