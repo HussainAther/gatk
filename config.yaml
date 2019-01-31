@@ -1,5 +1,7 @@
-samples: samples.tsv
+eamples: samples.tsv
 units: units.tsv
+
+report: "report/workflow.rst"
 
 ref:
   # name used in snpeff database
