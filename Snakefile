@@ -1,26 +1,38 @@
 import pandas as pd
+
 from snakemake import shell
 from snakemake.utils import validate
+from snakemake.utils import report
 
 shell("module load GATK")
-report: "report/workflow.rst"
-
-configfile: "config.yaml"
-validate(config, schema="../schemas/config.schema.yaml")
-
-samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
-validate(samples, schema="../schemas/samples.schema.yaml")
-
-units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
-#units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
-validate(units, schema="../schemas/units.schema.yaml")
 
 rule all:
     input:
         "annotated/all.vcf.gz",
         "qc/multiqc.html",
         "plots/depths.svg",
-        "plots/allele-freqs.svg"
+        "plots/allele-freqs.svg",
+        report: "report/workflow.rst"
+
+
+samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
+validate(samples, schema="schemas/samples.schema.yaml")
+
+units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
+validate(units, schema="schemas/units.schema.yaml")
+
+configfile: "config.yaml"
+validate(config, schema="schemas/config.schema.yaml")
+
+#rule report:
+#    input:  "report/workflow.rst"
+#    output: html="report.html"
+#    run:
+#        report("""
+#        Variant Calling report lol
+#
+#        """, output.html, metadata="Syed Hussain Ather (shussainather@gmail.com)", **input)
+
 
 rule snpeff:
     input:
@@ -112,7 +124,7 @@ if "restrict-regions" in config["processing"]:
         output:
             "called/regions.bed"
         conda:
-            "../envs/bedops.yaml"
+            "envs/bedops.yaml"
         shell:
             "bedextract {input} > {output}"
 
@@ -328,7 +340,7 @@ rule vcf_to_tsv:
     output:
         report("tables/calls.tsv.gz", caption="report/calls.rst", category="Calls")
     conda:
-        "../envs/rbt.yaml"
+        "envs/rbt.yaml"
     shell:
         "bcftools view --apply-filters PASS --output-type u {input} | "
         "rbt vcf-to-txt -g --fmt DP AD --info ANN | "
@@ -342,6 +354,6 @@ rule plot_stats:
         depths=report("plots/depths.svg", caption="report/depths.rst", category="Plots"),
         freqs=report("plots/allele-freqs.svg", caption="report/freqs.rst", category="Plots")
     conda:
-        "../envs/stats.yaml"
+        "envs/stats.yaml"
     script:
-        "../scripts/plot-depths.py"
+        "scripts/plot-depths.py"
