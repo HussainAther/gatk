@@ -104,7 +104,7 @@ rule snpeff:
     input:
         "filtered/all.vcf.gz",
     output:
-        vcf=reporter("snpeff", "annotated/all.vcf.gz.html"),
+        vcf=reporter("report/vcf.rst", "annotated/all.vcf.gz.html"),
         csvstats="snpeff/all.csv"
     log:
         "logs/snpeff.log"
@@ -283,7 +283,7 @@ rule multiqc:
         expand(["qc/samtools-stats/{u.sample}.txt", "qc/fastqc/{u.sample}.zip", "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()),
         "snpeff/all.csv"
     output:
-        reporter("QC", "qc/multiqc.html")
+        reporter("report/multiqc.rst", "qc/multiqc.html")
     log:
         "logs/multiqc.log"
     wrapper:
@@ -293,7 +293,7 @@ rule vcf_to_tsv:
     input:
         "annotated/all.vcf.gz"
     output:
-        reporter("tsv", "tables/calls.tsv.gz.html")
+        reporter("report/calls.rst", "tables/calls.tsv.gz.html")
     conda:
         "envs/rbt.yaml"
     shell:
@@ -303,8 +303,8 @@ rule plot_stats:
     input:
         "tables/calls.tsv.gz"
     output:
-        depths=reporter("depths", "plots/depths.svg.html"),
-        freqs=reporter("frequency", "plots/allele-freqs.svg.html")
+        depths=reporter("report/depths.rst", "plots/depths.svg.html"),
+        freqs=reporter("report/freqs.rst", "plots/allele-freqs.svg.html")
     conda:
         "envs/stats.yaml"
     script:
