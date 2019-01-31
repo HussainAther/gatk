@@ -1,17 +1,20 @@
 import pandas as pd
 
 from snakemake.utils import report as reporter
+from snakemake.utils import validate
 
 shell("module load GATK")
 
 report: "report/workflow.rst"
 
+configfile: "config.yaml"
+
 rule all:
     input:
-        ["annotated/all.vcf.gz",
+        "annotated/all.vcf.gz",
         "qc/multiqc.html",
         "plots/depths.svg",
-        "plots/allele-freqs.svg"]
+        "plots/allele-freqs.svg"
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 validate(samples, schema="schemas/samples.schema.yaml")
@@ -64,13 +67,16 @@ def get_regions_param(regions=config["processing"].get("restrict-regions"), defa
     return default
 
 def get_call_variants_params(wildcards, input):
-    return (get_regions_param(regions=input.regions, config["params"]["gatk"]["HaplotypeCaller"])
+    region = input.regions
+    caller = config["params"]["gatk"]["HaplotypeCaller"]
+    params = get_regions_param(egion, caller)
+    return params
 
 def get_recal_input(bai=False):
     # case 1: no duplicate removal
     f = "mapped/{sample}.sorted.bam"
-    if config["processing"]["remove-duplicates"]:
     # case 2: remove duplicates
+    if config["processing"]["remove-duplicates"]:
         f = "dedup/{sample}.bam"
     if bai:
         if config["processing"].get("restrict-regions"):
@@ -98,7 +104,7 @@ rule snpeff:
     input:
         "filtered/all.vcf.gz",
     output:
-        vcf=reporter("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
+        vcf=reporter("snpeff", "annotated/all.vcf.gz.html"),
         csvstats="snpeff/all.csv"
     log:
         "logs/snpeff.log"
@@ -217,7 +223,6 @@ rule map_reads:
     wrapper:
         "0.27.1/bio/bwa/mem"
 
-
 rule mark_duplicates:
     input:
         "mapped/{sample}.sorted.bam"
@@ -230,8 +235,6 @@ rule mark_duplicates:
         config["params"]["picard"]["MarkDuplicates"]
     wrapper:
         "0.26.1/bio/picard/markduplicates"
-
-
 
 rule recalibrate_base_qualities:
     input:
@@ -248,7 +251,6 @@ rule recalibrate_base_qualities:
     wrapper:
         "0.27.1/bio/gatk/baserecalibrator"
 
-
 rule samtools_index:
     input:
         "{prefix}.bam"
@@ -256,7 +258,6 @@ rule samtools_index:
         "{prefix}.bam.bai"
     wrapper:
         "0.27.1/bio/samtools/index"
-
 
 rule fastqc:
     input:
@@ -279,11 +280,10 @@ rule samtools_stats:
 
 rule multiqc:
     input:
-        expand(["qc/samtools-stats/{u.sample}.txt",
-        "qc/fastqc/{u.sample}.zip",
-        "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()), "snpeff/all.csv"
+        expand(["qc/samtools-stats/{u.sample}.txt", "qc/fastqc/{u.sample}.zip", "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()),
+        "snpeff/all.csv"
     output:
-        reporter("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
+        reporter("QC", "qc/multiqc.html")
     log:
         "logs/multiqc.log"
     wrapper:
@@ -293,7 +293,7 @@ rule vcf_to_tsv:
     input:
         "annotated/all.vcf.gz"
     output:
-        reporter("tables/calls.tsv.gz", caption="report/calls.rst", category="Calls")
+        reporter("tsv", "tables/calls.tsv.gz.html")
     conda:
         "envs/rbt.yaml"
     shell:
@@ -303,9 +303,10 @@ rule plot_stats:
     input:
         "tables/calls.tsv.gz"
     output:
-        depths=reporter("plots/depths.svg", caption="report/depths.rst", category="Plots"),
-        freqs=reporter("plots/allele-freqs.svg", caption="report/freqs.rst", category="Plots")
+        depths=reporter("depths", "plots/depths.svg.html"),
+        freqs=reporter("frequency", "plots/allele-freqs.svg.html")
     conda:
         "envs/stats.yaml"
     script:
         "scripts/plot-depths.py"
+
