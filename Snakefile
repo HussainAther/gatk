@@ -1,10 +1,9 @@
 import pandas as pd
-
-from snakemake import shell
-from snakemake.utils import validate
-from snakemake.utils import report
+import snakemake
 
 shell("module load GATK")
+
+report: "report/workflow.rst"
 
 rule all:
     input:
@@ -12,8 +11,6 @@ rule all:
         "qc/multiqc.html",
         "plots/depths.svg",
         "plots/allele-freqs.svg",
-        report: "report/workflow.rst"
-
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 validate(samples, schema="schemas/samples.schema.yaml")
