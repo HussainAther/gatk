@@ -20,20 +20,6 @@ units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=Fal
 validate(units, schema="schemas/units.schema.yaml")
 validate(config, schema="schemas/config.schema.yaml")
 
-rule snpeff:
-    input:
-        "filtered/all.vcf.gz",
-    output:
-        vcf=reporter("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
-        csvstats="snpeff/all.csv"
-    log:
-        "logs/snpeff.log"
-    params:
-        reference=config["ref"]["name"],
-        extra="-Xmx6g"
-    wrapper:
-        "0.27.1/bio/snpeff"
-
 ##### Wildcard constraints #####
 wildcard_constraints:
     vartype="snvs|indels",
@@ -113,6 +99,20 @@ if "restrict-regions" in config["processing"]:
             "envs/bedops.yaml"
         shell:
             "bedextract {input} > {output}"
+
+rule snpeff:
+    input:
+        "filtered/all.vcf.gz",
+    output:
+        vcf=reporter("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
+        csvstats="snpeff/all.csv"
+    log:
+        "logs/snpeff.log"
+    params:
+        reference=config["ref"]["name"],
+        extra="-Xmx6g"
+    wrapper:
+        "0.27.1/bio/snpeff"
 
 
 def get_call_variants_params(wildcards, input):
