@@ -1,13 +1,12 @@
 samples: samples.tsv
 units: units.tsv
 
-
 ref:
   # name used in snpeff database
-  name: hg19
-  genome: /vol/tiny/ref/autoref/Homo_sapiens/UCSC/hg19/BWAIndex/genome.fa
+  name: GRCz10
+  genome: Danio_rerio.GRCz10.cdna.all.fa
   # known variants (e.g. DBSNP)
-  known-variants: /vol/tiny/ref/autoref/Homo_sapiens/GATK/hg19/bundle/dbsnp_138.hg19.vcf
+  known-variants: 00-All.vcf.gz
 
 
 filtering:
@@ -26,10 +25,10 @@ processing:
   remove-duplicates: false
   # point to a bed file with e.g. captured regions if necessary,
   # see https://gatkforums.broadinstitute.org/gatk/discussion/4133/when-should-i-use-l-to-pass-in-a-list-of-intervals
-  restrict-regions: ../raw/captured_regions.bed
+  # restrict-regions: ../raw/captured_regions.bed
   # If regions are restricted, use this to enlarge them in order to include
   # flanking areas.
-  region-padding: 100
+  # region-padding: 100
 
 params:
   gatk:
@@ -41,13 +40,6 @@ params:
     MarkDuplicates: "REMOVE_DUPLICATES=true"
   trimmomatic:
     pe:
-      trimmer: 
-        - "ILLUMINACLIP:../raw/primers_adapters.fasta:2:30:10"
-        - "LEADING:3"
-        - "TRAILING:3"
-        - "SLIDINGWINDOW:4:15"
-        - "MINLEN:36"
-    se:
       trimmer: 
         - "ILLUMINACLIP:../raw/primers_adapters.fasta:2:30:10"
         - "LEADING:3"
