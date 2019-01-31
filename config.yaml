@@ -1,4 +1,4 @@
-eamples: samples.tsv
+samples: samples.tsv
 units: units.tsv
 
 ref:
