@@ -1,5 +1,7 @@
 import pandas as pd
 
+from snakemake.utils import report as reporter
+
 shell("module load GATK")
 
 report: "report/workflow.rst"
@@ -22,7 +24,7 @@ rule snpeff:
     input:
         "filtered/all.vcf.gz",
     output:
-        vcf=report("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
+        vcf=reporter("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
         csvstats="snpeff/all.csv"
     log:
         "logs/snpeff.log"
@@ -312,7 +314,7 @@ rule multiqc:
         "qc/fastqc/{u.sample}.zip",
         "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()), "snpeff/all.csv"
     output:
-        report("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
+        reporter("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
     log:
         "logs/multiqc.log"
     wrapper:
@@ -322,7 +324,7 @@ rule vcf_to_tsv:
     input:
         "annotated/all.vcf.gz"
     output:
-        report("tables/calls.tsv.gz", caption="report/calls.rst", category="Calls")
+        reporter("tables/calls.tsv.gz", caption="report/calls.rst", category="Calls")
     conda:
         "envs/rbt.yaml"
     shell:
@@ -330,13 +332,12 @@ rule vcf_to_tsv:
         "rbt vcf-to-txt -g --fmt DP AD --info ANN | "
         "gzip > {output}"
 
-
 rule plot_stats:
     input:
         "tables/calls.tsv.gz"
     output:
-        depths=report("plots/depths.svg", caption="report/depths.rst", category="Plots"),
-        freqs=report("plots/allele-freqs.svg", caption="report/freqs.rst", category="Plots")
+        depths=reporter("plots/depths.svg", caption="report/depths.rst", category="Plots"),
+        freqs=reporter("plots/allele-freqs.svg", caption="report/freqs.rst", category="Plots")
     conda:
         "envs/stats.yaml"
     script:
