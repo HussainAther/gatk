@@ -63,7 +63,7 @@ def get_trimmed_reads(wildcards):
 
 def get_sample_bams(wildcards):
     """Get all aligned reads of given sample."""
-    return expand("recal/{sample}.bam", sample=wildcards.sample)
+    return expand("recal/{sample}-{unit}.bam", sample=wildcards.sample, unit=units.loc[wildcards.sample].unit)
 
 def get_regions_param(regions=config["processing"].get("restrict-regions"), default=""):
     if regions:
@@ -82,10 +82,10 @@ def get_call_variants_params(wildcards, input):
 
 def get_recal_input(bai=False):
     # case 1: no duplicate removal
-    f = "mapped/{sample}.sorted.bam"
+    f = "mapped/{sample}-{unit}.sorted.bam"
     # case 2: remove duplicates
     if config["processing"]["remove-duplicates"]:
-        f = "dedup/{sample}.bam"
+        f = "dedup/{sample}-{unit}.bam"
     if bai:
         if config["processing"].get("restrict-regions"):
             # case 3: need an index because random access is required
@@ -275,8 +275,8 @@ rule fastqc:
     input:
         unpack(get_fastq)
     output:
-        html="qc/fastqc/{sample}.html",
-        zip="qc/fastqc/{sample}.zip"
+        html="qc/fastqc/{sample}-{unit}.html",
+        zip="qc/fastqc/{sample}-{unit}.zip"
     wrapper:
         "0.27.1/bio/fastqc"
 
@@ -288,7 +288,7 @@ rule multiqc:
                u=units.itertuples()),
         "snpeff/all.csv"
     output:
-        report("qc/multiqc.html", caption="../report/multiqc.rst", category="Quality control")
+        report("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
     log:
         "logs/multiqc.log"
     wrapper:
