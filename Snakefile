@@ -17,7 +17,10 @@ rule all:
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 snakemake.utils.validate(samples, schema="schemas/samples.schema.yaml")
-units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
+
+units = pd.read_table(config["units"], dtype=str).set_index(["sample", "unit"], drop=False)
+units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
+
 snakemake.utils.validate(units, schema="schemas/units.schema.yaml")
 snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 
@@ -30,6 +33,7 @@ else:
 wildcard_constraints:
     vartype="snvs|indels",
     sample="|".join(samples.index),
+    unit="|".join(units["unit"]),
 
 ##### Helper functions #####
 
@@ -40,9 +44,9 @@ def get_fastq(wildcards):
         return {"r1": fastqs.fq1, "r2": fastqs.fq2}
     return {"r1": fastqs.fq1}
 
-def is_single_end(sample):
-    """Return True if sample is single end."""
-    return pd.isnull(units.loc[(sample), "fq2"])
+def is_single_end(sample, unit):
+    """Return True if sample-unit is single end."""
+    return pd.isnull(units.loc[(sample, unit), "fq2"])
 
 def get_read_group(wildcards):
     """Denote sample name and platform in read group."""
@@ -50,7 +54,12 @@ def get_read_group(wildcards):
 
 def get_trimmed_reads(wildcards):
     """Get trimmed reads of given sample-unit."""
-    return "{Batch}".format(**wildcards)
+    if not is_single_end(**wildcards):
+        # paired-end sample
+        return expand("trimmed/{sample}-{unit}.{group}.fastq.gz",
+                      group=[1, 2], **wildcards)
+    # single end sample
+    return "trimmed/{sample}-{unit}.fastq.gz".format(**wildcards)
 
 def get_sample_bams(wildcards):
     """Get all aligned reads of given sample."""
@@ -99,6 +108,7 @@ if "restrict-regions" in config["processing"]:
         shell:
             "bedextract {input} > {output}"
 
+
 rule snpeff:
     input:
         "filtered/all.vcf.gz",
@@ -131,7 +141,7 @@ rule call_variants:
 rule combine_calls:
     input:
         ref=config["ref"]["genome"],
-        gvcfs=expand("called/{sample}.g.vcf.gz", sample=samples)
+        gvcfs=expand("called/{sample}.g.vcf.gz", sample=samples.index)
     output:
         gvcf="called/all.g.vcf.gz"
     log:
@@ -208,11 +218,11 @@ rule merge_calls:
 
 rule map_reads:
     input:
-        reads="{sample}.fastq.gz"
+        reads=get_trimmed_reads
     output:
-        temp("mapped/{sample}.sorted.bam")
+        temp("mapped/{sample}-{unit}.sorted.bam")
     log:
-        "logs/bwa_mem/{sample}.log"
+        "logs/bwa_mem/{sample}-{unit}.log"
     params:
         index=config["ref"]["genome"],
         extra=get_read_group,
@@ -221,6 +231,7 @@ rule map_reads:
     threads: 8
     wrapper:
         "0.27.1/bio/bwa/mem"
+
 
 rule mark_duplicates:
     input:
@@ -240,23 +251,25 @@ rule recalibrate_base_qualities:
         bam=get_recal_input(),
         bai=get_recal_input(bai=True),
         ref=config["ref"]["genome"],
-        known=config["ref"]["known-variants"],
+        known=config["ref"]["known-variants"]
     output:
-        bam=protected("recal/{sample}.bam")
+        bam=protected("recal/{sample}-{unit}.bam")
     params:
         extra=get_regions_param() + config["params"]["gatk"]["BaseRecalibrator"]
     log:
-        "logs/gatk/bqsr/{sample}.log"
+        "logs/gatk/bqsr/{sample}-{unit}.log"
     wrapper:
         "0.27.1/bio/gatk/baserecalibrator"
 
-rule samtools_index:
+rule samtools_stats:
     input:
-        "{prefix}.bam"
+        "recal/{sample}-{unit}.bam"
     output:
-        "{prefix}.bam.bai"
+        "qc/samtools-stats/{sample}-{unit}.txt"
+    log:
+        "logs/samtools-stats/{sample}-{unit}.log"
     wrapper:
-        "0.27.1/bio/samtools/index"
+        "0.27.1/bio/samtools/stats"
 
 rule fastqc:
     input:
@@ -267,22 +280,15 @@ rule fastqc:
     wrapper:
         "0.27.1/bio/fastqc"
 
-rule samtools_stats:
-    input:
-        "recal/{sample}.bam"
-    output:
-        "qc/samtools-stats/{sample}.txt"
-    log:
-        "logs/samtools-stats/{sample}.log"
-    wrapper:
-        "0.27.1/bio/samtools/stats"
-
 rule multiqc:
     input:
-        expand(["qc/samtools-stats/{u.sample}.txt", "qc/fastqc/{u.sample}.zip", "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()),
+        expand(["qc/samtools-stats/{u.sample}-{u.unit}.txt",
+                "qc/fastqc/{u.sample}-{u.unit}.zip",
+                "qc/dedup/{u.sample}-{u.unit}.metrics.txt"],
+               u=units.itertuples()),
         "snpeff/all.csv"
     output:
-        report("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
+        report("qc/multiqc.html", caption="../report/multiqc.rst", category="Quality control")
     log:
         "logs/multiqc.log"
     wrapper:
