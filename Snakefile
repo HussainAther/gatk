@@ -1,7 +1,6 @@
 import pandas as pd
 
-from snakemake.utils import report as reporter
-from snakemake.utils import validate
+import snakemake
 
 shell("module load GATK")
 
@@ -11,16 +10,16 @@ configfile: "config.yaml"
 
 rule all:
     input:
-        "annotated/all.vcf.gz",
+       ["annotated/all.vcf.gz",
         "qc/multiqc.html",
         "plots/depths.svg",
-        "plots/allele-freqs.svg"
+        "plots/allele-freqs.svg"]
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
-validate(samples, schema="schemas/samples.schema.yaml")
+snakemake.utils.validate(samples, schema="schemas/samples.schema.yaml")
 units = pd.read_table(config["units"], dtype=str).set_index(["sample"], drop=False)
-validate(units, schema="schemas/units.schema.yaml")
-validate(config, schema="schemas/config.schema.yaml")
+snakemake.utils.validate(units, schema="schemas/units.schema.yaml")
+snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 
 if config["filtering"]["vqsr"]:
     filter_type="recalibrated"
@@ -104,7 +103,7 @@ rule snpeff:
     input:
         "filtered/all.vcf.gz",
     output:
-        vcf=reporter("report/vcf.rst", "annotated/all.vcf.gz.html"),
+        vcf=report("annotated/all.vcf.gz", caption="report/vcf.rst", category="Calls"),
         csvstats="snpeff/all.csv"
     log:
         "logs/snpeff.log"
@@ -283,7 +282,7 @@ rule multiqc:
         expand(["qc/samtools-stats/{u.sample}.txt", "qc/fastqc/{u.sample}.zip", "qc/dedup/{u.sample}.metrics.txt"], u=units.itertuples()),
         "snpeff/all.csv"
     output:
-        reporter("report/multiqc.rst", "qc/multiqc.html")
+        report("qc/multiqc.html", caption="report/multiqc.rst", category="Quality control")
     log:
         "logs/multiqc.log"
     wrapper:
@@ -293,7 +292,7 @@ rule vcf_to_tsv:
     input:
         "annotated/all.vcf.gz"
     output:
-        reporter("report/calls.rst", "tables/calls.tsv.gz.html")
+        report("tables/calls.tsv.gz", caption="report/calls.rst", category="Calls")
     conda:
         "envs/rbt.yaml"
     shell:
@@ -303,8 +302,8 @@ rule plot_stats:
     input:
         "tables/calls.tsv.gz"
     output:
-        depths=reporter("report/depths.rst", "plots/depths.svg.html"),
-        freqs=reporter("report/freqs.rst", "plots/allele-freqs.svg.html")
+        depths=report("plots/depths.svg", caption="report/depths.rst", category="Plots"),
+        freqs=report("plots/allele-freqs.svg", caption="report/freqs.rst", category="Plots")
     conda:
         "envs/stats.yaml"
     script:
