@@ -50,7 +50,7 @@ def is_single_end(sample, unit):
 
 def get_read_group(wildcards):
     """Denote sample name and platform in read group."""
-    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(platform=units.loc[(sample), "platform"])
+    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(sample=wildcards.sample, platform=units.loc[(wildcards.sample, wildcards.unit), "platform"])
 
 def get_trimmed_reads(wildcards):
     """Get trimmed reads of given sample-unit."""
@@ -79,7 +79,7 @@ def get_regions_param(regions=config["processing"].get("restrict-regions"), defa
 def get_call_variants_params(wildcards, input):
     region = input.regions
     caller = config["params"]["gatk"]["HaplotypeCaller"]
-    params = get_regions_param(egion, caller)
+    params = get_regions_param(region, caller)
     return params
 
 def get_recal_input(bai=False):
