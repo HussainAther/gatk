@@ -1,5 +1,3 @@
 sample	unit	platform	fq1	fq2	Batch
-Undetermined_S0_L001_R1_001	Undetermined_S0_L001	SOLID	Undetermined_S0_L001_R1_001.fastq.gz	Undetermined_S0_L001_R2_001.fastq.gz	Batch1 
-Undetermined_S0_L002_R1_001	Undetermined_S0_L002	SOLID	Undetermined_S0_L002_R1_001.fastq.gz	Undetermined_S0_L002_R2_001.fastq.gz	Batch2
-Undetermined_S0_L001_R2_001	Undetermined_S0_L001	SOLID	Undetermined_S0_L001_R1_001.fastq.gz	Undetermined_S0_L001_R2_001.fastq.gz	Batch1 
-Undetermined_S0_L002_R2_001	Undetermined_S0_L002	SOLID	Undetermined_S0_L002_R1_001.fastq.gz	Undetermined_S0_L002_R2_001.fastq.gz	Batch2
+Undetermined_S0_L001	1	SOLID	Undetermined_S0_L001-1_R1_001.fastq.gz	Undetermined_S0_L001-1_R2_001.fastq.gz	Batch1 
+Undetermined_S0_L002	2	SOLID	Undetermined_S0_L002-2_R1_001.fastq.gz	Undetermined_S0_L002-2_R2_001.fastq.gz	Batch2
