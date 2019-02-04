@@ -2,7 +2,7 @@ import pandas as pd
 
 import snakemake
 
-shell("module load GATK")
+snakemake.shell("module load GATK")
 
 report: "report/workflow.rst"
 
@@ -261,8 +261,11 @@ rule recalibrate_base_qualities:
         extra=get_regions_param() + config["params"]["gatk"]["BaseRecalibrator"]
     log:
         "logs/gatk/bqsr/{sample}-{unit}.log"
+    params:
+        extra="",
+        java_opts=""
     wrapper:
-        "0.27.1/bio/gatk/baserecalibrator"
+        "0.31.1/bio/gatk/baserecalibrator"
 
 rule samtools_stats:
     input:
