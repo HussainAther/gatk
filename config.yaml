@@ -32,10 +32,10 @@ processing:
 
 params:
   gatk:
-    HaplotypeCaller: ""
-    BaseRecalibrator: ""
-    GenotypeGVCFs: ""
-    VariantRecalibrator: ""
+    HaplotypeCaller: "-Xmx4G"
+    BaseRecalibrator: "-Xmx4G"
+    GenotypeGVCFs: "-Xmx4G"
+    VariantRecalibrator: "-Xmx4G"
   picard:
     MarkDuplicates: "REMOVE_DUPLICATES=true -XX:MaxPermSize=512m"
   trimmomatic:
