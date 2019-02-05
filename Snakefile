@@ -258,12 +258,12 @@ rule recalibrate_base_qualities:
     output:
         bam=protected("recal/{sample}-{unit}.bam")
     params:
-        extra=get_regions_param(),
+        extra="",
         java_opts=""
     log:
         "logs/gatk/bqsr/{sample}-{unit}.log"
     wrapper:
-        "0.31.1/bio/gatk/baserecalibrator"
+        "0.27.1/bio/gatk/baserecalibrator"
 
 rule samtools_stats:
     input:
