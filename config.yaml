@@ -6,7 +6,7 @@ ref:
   name: GRCz10
   genome: Danio_rerio.GRCz10.cdna.all.fa
   # known variants (e.g. DBSNP)
-  known-variants: 00-All.vcf.gz
+  known-variants: 00-All.vcf
 
 
 filtering:
@@ -41,7 +41,7 @@ params:
   trimmomatic:
     pe:
       trimmer: 
-        - "ILLUMINACLIP:../raw/primers_adapters.fasta:2:30:10"
+        - "ILLUMINACLIP:raw/primers_adapters.fasta:2:30:10"
         - "LEADING:3"
         - "TRAILING:3"
         - "SLIDINGWINDOW:4:15"
