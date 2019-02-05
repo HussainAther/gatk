@@ -263,7 +263,7 @@ rule recalibrate_base_qualities:
     log:
         "logs/gatk/bqsr/{sample}-{unit}.log"
     wrapper:
-        "0.27.1/bio/gatk/baserecalibrator"
+        "0.31.1/bio/gatk/baserecalibrator"
 
 rule samtools_stats:
     input:
