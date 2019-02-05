@@ -258,7 +258,7 @@ rule recalibrate_base_qualities:
     output:
         bam=protected("recal/{sample}-{unit}.bam")
     params:
-        extra="",
+        extra="--out",
         java_opts="-T"
     log:
         "logs/gatk/bqsr/{sample}-{unit}.log"
