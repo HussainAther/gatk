@@ -33,7 +33,7 @@ processing:
 params:
   gatk:
     HaplotypeCaller: "-Xmx4G"
-    BaseRecalibrator: "-Xmx4G"
+    #BaseRecalibrator: "-Xmx4G"
     GenotypeGVCFs: "-Xmx4G"
     VariantRecalibrator: "-Xmx4G"
   picard:

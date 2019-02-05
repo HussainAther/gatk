@@ -21,8 +21,8 @@ snakemake.utils.validate(samples, schema="schemas/samples.schema.yaml")
 units = pd.read_table(config["units"], dtype=str).set_index(["sample", "unit"], drop=False)
 units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
 
-snakemake.utils.validate(units, schema="schemas/units.schema.yaml")
-snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
+#snakemake.utils.validate(units, schema="schemas/units.schema.yaml")
+#snakemake.utils.validate(config, schema="schemas/config.schema.yaml")
 
 if config["filtering"]["vqsr"]:
     filter_type="recalibrated"
