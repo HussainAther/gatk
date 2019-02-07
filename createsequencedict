@@ -1,4 +1,4 @@
 #!/bin/sh
-java -jar picard.jar CreateSequenceDictionary \ 
+picard CreateSequenceDictionary \ 
     R=Danio_rerio.GRCz10.cdna.all.fixed.fa
     O=Danio_rerio.GRCz10.cdna.all.fixed.dict
