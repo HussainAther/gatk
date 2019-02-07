@@ -31,3 +31,6 @@ scripts/.snakemake*
 !.test/config.yaml
 !report
 !report/*.rst
+!mygene.py
+!samtoolsindex
+!createsequencedict
