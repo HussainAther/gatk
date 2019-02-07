@@ -4,7 +4,7 @@ units: units.tsv
 ref:
   # name used in snpeff database
   name: GRCz10
-  genome: Danio_rerio.GRCz10.cdna.all.fa
+  genome: Danio_rerio.GRCz10.cdna.all.fixed.fa
   # known variants (e.g. DBSNP)
   known-variants: trio.2010_06.ychr.sites.vcf
 
@@ -37,7 +37,7 @@ params:
     GenotypeGVCFs: "-Xmx4G"
     VariantRecalibrator: "-Xmx4G"
   picard:
-    MarkDuplicates: "REMOVE_DUPLICATES=true"
+    MarkDuplicates: "REMOVE_DUPLICATES=true -Xms12G -Xmx14G"
   trimmomatic:
     pe:
       trimmer: 
