@@ -1,2 +1,2 @@
 #!/bin/sh
-CreateSequenceDictionary -R Danio_rerio.GRCz10.cdna.all.fixed.fa -O Danio_rerio.GRCz10.cdna.all.fixed.dict
+picard CreateSequenceDictionary R=Danio_rerio.GRCz10.cdna.all.fixed.fa O=Danio_rerio.GRCz10.cdna.all.fixed.dict
