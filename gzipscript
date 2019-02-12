@@ -1,2 +1,2 @@
 #!/bin/sh
-gunzip Snpfisher.sorted.vcf.gz
+gunzip danio_rerio.gvf.gz
