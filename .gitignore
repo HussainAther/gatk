@@ -39,3 +39,4 @@ scripts/.snakemake*
 !faidxscript
 !bwaindexscript
 !gzipscript
+!gvcfscript
