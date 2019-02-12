@@ -1,0 +1,2 @@
+#!/bin/sh
+bwa index Danio_rerio.GRCz10.cdna.all.fixed.fa
