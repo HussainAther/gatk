@@ -34,3 +34,4 @@ scripts/.snakemake*
 !mygene.py
 !samtoolsindex
 !createsequencedict
+!fixname.py
