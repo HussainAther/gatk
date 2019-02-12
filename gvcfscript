@@ -1,2 +1,2 @@
 #!/bin/sh
-grep -v 'BLOCKAVG' danio_rerio.gvf.gz > danio_rerio.vcf
+grep -v 'BLOCKAVG' danio_rerio.gvf > danio_rerio.vcf
