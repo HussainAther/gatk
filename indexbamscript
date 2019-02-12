@@ -1,2 +1,3 @@
 #!/bin/sh
-samtools index mapped/*
+samtools index mapped/Undetermined_S0_L001-1.sorted.bam
+samtools index mapped/Undetermined_S0_L002-2.sorted.bam
