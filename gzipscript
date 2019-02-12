@@ -1,0 +1,2 @@
+#!/bin/sh
+gunzip SNPfisher_FLI+TL+WIK.vcf.gz
