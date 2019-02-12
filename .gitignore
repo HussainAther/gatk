@@ -38,3 +38,4 @@ scripts/.snakemake*
 !indexbamscript
 !faidxscript
 !bwaindexscript
+!gzipscript
