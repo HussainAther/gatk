@@ -1,2 +1,3 @@
 #!/bin/sh
-gatk IndexFeatureFile -F danio_rerio.vcf.gz
+#gatk IndexFeatureFile -F danio_rerio.vcf.gz
+gatk IndexFeatureFile -F Snpfisher.sorted.vcf
