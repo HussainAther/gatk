@@ -1,0 +1,2 @@
+#!/bin/sh
+gatk IndexFeatureFile -F danio_rerio.vcf.gz
