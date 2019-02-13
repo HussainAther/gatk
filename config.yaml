@@ -6,7 +6,7 @@ ref:
   name: GRCz10
   genome: Danio_rerio.GRCz10.cdna.all.fixed.fa
   # known variants (e.g. DBSNP)
-  known-variants: Snpfisher.sorted.vcf
+  known-variants: NHGRI1.danRer10.variant.vcf.gz
 
 
 filtering:
