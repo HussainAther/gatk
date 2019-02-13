@@ -4,7 +4,7 @@ units: units.tsv
 ref:
   # name used in snpeff database
   name: GRCz10
-  genome: Danio_rerio.GRCz10.cdna.all.fixed.fa
+  genome: Danio_rerio.GRCz10.cdna.all.fixed2.fa
   # known variants (e.g. DBSNP)
   known-variants: NHGRI1.danRer10.variant.vcf
 
