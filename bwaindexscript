@@ -1,2 +1,2 @@
 #!/bin/sh
-bwa index Danio_rerio.GRCz10.cdna.all.fixed.fa
+bwa index Danio_rerio.GRCz10.cdna.all.fixed2.fa
