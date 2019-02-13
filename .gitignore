@@ -41,3 +41,4 @@ scripts/.snakemake*
 !gzipscript
 !gvcfscript
 !indexfeaturefilescript
+!fixchr.py
