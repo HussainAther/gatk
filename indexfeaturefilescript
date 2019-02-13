@@ -1,4 +1,5 @@
 #!/bin/sh
 #gatk IndexFeatureFile -F danio_rerio.vcf.gz
 #gatk IndexFeatureFile -F Snpfisher.sorted.vcf
-gatk IndexFeatureFile -F NHGRI1.danRer10.variant.vcf.gz
+#gatk IndexFeatureFile -F NHGRI1.danRer10.variant.vcf.gz
+gatk IndexFeatureFile -F NHGRI1.danRer10.variant.vcf
