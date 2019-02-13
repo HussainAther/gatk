@@ -1,2 +1,4 @@
 #!/bin/sh
-gunzip danio_rerio.gvf.gz
+# gunzip danio_rerio.gvf.gz
+bgzip -c danio_rerio.vcf > danio_rerio.vcf.gz
+tabix -p vcf danio_rerio.vcf.gz
