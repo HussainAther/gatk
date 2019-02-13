@@ -40,3 +40,4 @@ scripts/.snakemake*
 !bwaindexscript
 !gzipscript
 !gvcfscript
+!indexfeaturefilescript
