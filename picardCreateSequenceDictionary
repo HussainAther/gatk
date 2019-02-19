@@ -1,1 +1,2 @@
 #!/bin/sh
+java -Xmx2g -jar CreateSequenceDictionary.jar REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa OUTPUT=Danio_rerio.GRCz10.cdna.all.fixed2.fa.dict
