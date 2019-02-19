@@ -214,6 +214,8 @@ rule merge_calls:
         vcf="filtered/all.vcf.gz"
     log:
         "logs/picard/merge-filtered.log"
+    params:
+        config["params"]["picard"]["MarkDuplicates"]
     wrapper:
         "0.27.1/bio/picard/mergevcfs"
 
