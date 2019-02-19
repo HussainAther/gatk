@@ -1,0 +1,3 @@
+#!/bin/sh
+samtools view mapped/Undetermined_S0_L001-1.sorted.bam | cat header.sam - | samtools view -Sb - > Undetermined_S0_L001-1.sorted.fixed.bam
+samtools view mapped/Undetermined_S0_L002-2.sorted.bam | cat header.sam - | samtools view -Sb - > Undetermined_S0_L002-2.sorted.fixed.bam
