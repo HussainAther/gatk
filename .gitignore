@@ -42,3 +42,4 @@ scripts/.snakemake*
 !gvcfscript
 !indexfeaturefilescript
 !fixchr.py
+!picardCreateSequenceDictionary
