@@ -1,2 +1,2 @@
 #!/bin/sh
-samtools faidx Danio_rerio.GRCz10.cdna.all.fixed.fa
+samtools faidx Danio_rerio.GRCz10.cdna.all.fixed2.fa
