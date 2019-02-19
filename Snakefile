@@ -246,7 +246,7 @@ rule mark_duplicates:
     params:
         config["params"]["picard"]["MarkDuplicates"]
     wrapper:
-        "0.26.1/bio/picard/markduplicates"
+        "0.31.1/bio/picard/markduplicates"
 
 rule recalibrate_base_qualities:
     input:
