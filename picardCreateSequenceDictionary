@@ -1,4 +1,4 @@
 #!/bin/sh
 # picard -Xmx2g CreateSequenceDictionary REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa OUTPUT=Danio_rerio.GRCz10.cdna.all.fixed2.fa.dict
-picard -Xmx2g ReorderSam INPUT=Undetermined_S0_L001-1.sorted.bam OUTPUT=Undetermined_S0_L001-1.sorted.reordered.bam REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa
-picard -Xmx2g ReorderSam INPUT=Undetermined_S0_L002-2.sorted.bam OUTPUT=Undetermined_S0_L001-1.sorted.reordered.bam REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa
+picard -Xmx2g ReorderSam INPUT=mapped/Undetermined_S0_L001-1.sorted.bam OUTPUT=Undetermined_S0_L001-1.sorted.reordered.bam REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa
+picard -Xmx2g ReorderSam INPUT=mapped/Undetermined_S0_L002-2.sorted.bam OUTPUT=Undetermined_S0_L001-1.sorted.reordered.bam REFERENCE=Danio_rerio.GRCz10.cdna.all.fixed2.fa
