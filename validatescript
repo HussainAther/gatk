@@ -1,4 +1,3 @@
 #!/bin/sh
-for i in mapped/*bam 
-    do picard ValidateSamFile MODE=SUMMARY INPUT=mapped/$i OUTPUT=$i_valid.bam
-done
+picard ValidateSamFile MODE=SUMMARY INPUT=mapped/Undetermined_S0_L001-1.sorted.bam OUTPUT=Undetermined_S0_L001-1.sorted.valid.bam
+picard ValidateSamFile MODE=SUMMARY INPUT=mapped/Undetermined_S0_L002-2.sorted.bam OUTPUT=Undetermined_S0_L002-2.sorted.valid.bam
