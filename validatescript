@@ -1,0 +1,4 @@
+#!/bin/sh
+for i in mapped/*bam 
+    do picard ValidateSamFile MODE=SUMMARY INPUT=mapped/$i OUTPUT=$i_valid.bam
+done
