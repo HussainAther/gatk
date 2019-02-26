@@ -44,3 +44,4 @@ scripts/.snakemake*
 !fixchr.py
 !picardCreateSequenceDictionary
 !fixbamheader
+!validatescript
