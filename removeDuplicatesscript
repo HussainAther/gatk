@@ -1,0 +1,3 @@
+#!/bin/sh
+samtools view -HS Undetermined_S0_L001-1.sorted.sam | sort | uniq -c > Undetermined_S0_L001-1.sorted.uniq.sam
+samtools view -HS Undetermined_S0_L002-2.sorted.sam | sort | uniq -c > Undetermined_S0_L002-2.sorted.uniq.sam
