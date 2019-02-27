@@ -46,3 +46,4 @@ scripts/.snakemake*
 !fixbamheader
 !validatescript
 !removeDuplicatesscript
+!removeheader
