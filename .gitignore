@@ -45,3 +45,4 @@ scripts/.snakemake*
 !picardCreateSequenceDictionary
 !fixbamheader
 !validatescript
+!removeDuplicatesscript
