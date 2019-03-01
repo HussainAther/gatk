@@ -234,7 +234,7 @@ rule map_reads:
         sort_order="coordinate"
     threads: 8
     wrapper:
-        "0.27.1/bio/bwa/mem"
+        "0.31.1/bio/bwa/mem"
 
 
 rule mark_duplicates:
