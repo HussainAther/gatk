@@ -37,7 +37,7 @@ params:
     GenotypeGVCFs: "-Xmx4G"
     VariantRecalibrator: "-Xmx4G"
   picard:
-    MarkDuplicates: "REMOVE_DUPLICATES=true"
+    MarkDuplicates: "REMOVE_DUPLICATES=true --REMOVE_SEQUENCING_DULPICATES=true"
   trimmomatic:
     pe:
       trimmer: 
