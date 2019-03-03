@@ -48,3 +48,4 @@ scripts/.snakemake*
 !removeDuplicatesscript
 !removeheader
 !headercheck.py
+!replacesamheader
