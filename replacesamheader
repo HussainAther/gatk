@@ -1,3 +1,3 @@
 #!/bin/sh
-picard ReplaceSamHeader I=mapped/Undetermined_S0_L001-1.sorted.bam HEADER=Undetermined_S0_L001-1.sorted.newheader.bam O=Undetermined_S0_L001-1.sorted.withnewheader.bam
-picard ReplaceSamHeader I=mapped/Undetermined_S0_L002-2.sorted.bam HEADER=Undetermined_S0_L002-2.sorted.newheader.bam O=Undetermined_S0_L002-2.sorted.withnewheader.bam
+picard ReplaceSamHeader I=mapped/Undetermined_S0_L001-1.sorted.bam HEADER=mapped/Undetermined_S0_L001-1.sorted.newheader.bam O=mapped/Undetermined_S0_L001-1.sorted.withnewheader.bam
+picard ReplaceSamHeader I=mapped/Undetermined_S0_L002-2.sorted.bam HEADER=mapped/Undetermined_S0_L002-2.sorted.newheader.bam O=mapped/Undetermined_S0_L002-2.sorted.withnewheader.bam
