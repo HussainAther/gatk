@@ -1,8 +1,8 @@
 chr_list = []
 
-o = open("/data/athersh/gatk/mapped/Undetermined_S0_L001-1.sorted.newheader.sam", "w")
+o = open("/data/athersh/gatk/mapped/Undetermined_S0_L002-2.sorted.newheader.sam", "w")
 
-with open("/data/athersh/gatk/mapped/Undetermined_S0_L001-1.sorted.header.sam", "r") as file:
+with open("/data/athersh/gatk/mapped/Undetermined_S0_L002-2.sorted.header.sam", "r") as file:
     for line in file:
         if "chr" in line:
             chro = line.split("\t")[1].replace("SN:", "")  
