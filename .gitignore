@@ -49,3 +49,4 @@ scripts/.snakemake*
 !removeheader
 !headercheck.py
 !replacesamheader
+!checkline.py
