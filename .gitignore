@@ -51,3 +51,4 @@ scripts/.snakemake*
 !replacesamheader
 !checkline.py
 !changechrname.sh
+!fixcontigheader.py
